@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Page parser</title>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script src="js/main.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+</head>
+<body>
+
+    <h3>Парсер страниц URL</h3>
+    <span> Выводит список слов встречающихся на URL и их количество.</span>
+    <br><br>
+
+    <div id="request-page-form">
+        <form>
+            <label> URL: </label>
+            <input type="text" name="url" class="text-input" value="http://ya.ru">
+            <button id="request-page">Запросить URL</button>
+            <br>
+            <span class="form-field-help"> Пример: http://ya.ru</span>
+            <br>
+            <span class="form-field-help"> Одну страницу можно запрашивать несколько раз, каждый запрос будет сохранен в БД.</span>
+        </form>
+        <br><br>
+    </div>
+
+    <table id="pages-table" border="1">
+        <thead>
+            <tr>
+                <td colspan="2">Запрошенные страницы</td>
+            </tr>
+            <tr>
+                <td width="50px">Id</td>
+                <td>URL</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="page : ${pages}">
+                <td th:text="${page.id}"></td>
+                <td th:text="${page.url}"></td>
+            </tr>
+        </tbody>
+    </table>
+    <br>
+
+    <table id="requests-table" border="1">
+        <thead>
+            <tr>
+                <td colspan="3">Предыдущие запросы страницы</td>
+            </tr>
+            <tr>
+                <td width="50px">Id</td>
+                <td>Time</td>
+                <td>HttpStatusCode</td>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <br>
+
+    <table id="words-table" border="1">
+        <thead>
+            <tr>
+                <td colspan="3">Список слов</td>
+            </tr>
+            <tr>
+                <td width="50px">Id</td>
+                <td>Word</td>
+                <td>Count</td>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+</body>
+</html>
