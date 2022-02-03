@@ -11,6 +11,7 @@ public class WordsCounter {
      * @return Map(слово, количество повторов)
      */
     public Map<String,Long> countWords(String[] words){
+
         Map<String,Long> wordsMap= new HashMap<String,Long>();
         for (String word:words) {
             Long cnt;

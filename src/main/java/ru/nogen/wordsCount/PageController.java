@@ -1,5 +1,9 @@
 package ru.nogen.wordsCount;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 import org.jsoup.Connection;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
@@ -29,10 +33,12 @@ public class PageController {
     @Autowired
     private WordRepository wordRepository;
 
+    private static final Logger LOGGER = LogManager.getLogger(PageController.class);
     // Возвращаем list всех запрошенных ранее страниц (URL) из БД
     @GetMapping("/pages/")
     public List<Page> list(){
 
+        LOGGER.info("Запросили список всех страниц.");
         Iterable<Page> pageIterable = pageRepository.findAll();
         ArrayList<Page> pages = new ArrayList<Page>();
         for (Page page:pageIterable) {
@@ -46,6 +52,7 @@ public class PageController {
     @GetMapping("/page/requests/{pageId}")
     public List<PageRequest> getPagerequestList(@PathVariable int pageId){
 
+        LOGGER.info("Запросили запросы для страницы с Id = " + pageId);
         Iterable<PageRequest> pageRequestIterable = pageRequestRepository.findBypage_id(pageId);
         ArrayList<PageRequest> pageRequests = new ArrayList<PageRequest>();
         for (PageRequest pageRequest:pageRequestIterable) {
@@ -58,6 +65,9 @@ public class PageController {
     // Возвращаем list всех слов из БД для конкретного ранее произведенного запроса по id запроса
     @GetMapping("/page/request/word/{pageRequestId}")
     public List<Word> getWords4Request(@PathVariable int pageRequestId){
+
+        LOGGER.info("Запросили слова для запроса с Id = " + pageRequestId);
+
         Iterable<Word> wordIterable = wordRepository.findByPage_request_id(pageRequestId);
         ArrayList<Word> words = new ArrayList<Word>();
         for (Word word:wordIterable) {
@@ -70,6 +80,9 @@ public class PageController {
 // Запрос страницы по введенному пользователем адресу, сохранение данных в БД
     @PostMapping("/pages/")
     public int addPage(Page page){
+
+        LOGGER.info("Запрос на добавление страницы с URL = " + page.getUrl());
+        Marker url = MarkerManager.getMarker("url");
 
         int httpStatusCode=0;
         Map<String,Long> words = new HashMap<String,Long>();
@@ -88,18 +101,18 @@ public class PageController {
     // Отлавливаем плохие статусы
         } catch (HttpStatusException e) {
             httpStatusCode = e.getStatusCode();
-            e.printStackTrace();
+            LOGGER.error(url,"Запрос страницы с URL = " + page.getUrl() + " вернул плохой статус. Ошибка = " + e.getMessage());
     // Если формат URL не верный вернем -1
         }catch (final IllegalArgumentException e) {
-            e.printStackTrace();
+            LOGGER.error(url,"Запрос страницы URL = " + page.getUrl() + " с неверным форматом url. Ошибка = " + e.getMessage());
             return -1;
     // Если хост не верный вернем -2
         }catch (UnknownHostException e) {
-            e.printStackTrace();
+            LOGGER.error(url,"Запрос страницы URL = " + page.getUrl() + " с неверным хостом. Ошибка = " + e.getMessage());
             return -2;
     // Остальные ошибки - надо отлаживать если появятся
         }catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error(url,"Запрос страницы URL = " + page.getUrl() + " вернул ошибку = " + e.getMessage());
         }
     // Создаем запрос
         PageRequest newPageRequest = new PageRequest();
